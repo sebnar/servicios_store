@@ -1,0 +1,180 @@
+# ===========================================
+# SERVICIOS STORE - .gitignore
+# ===========================================
+
+# ===========================================
+# DEPENDENCIAS
+# ===========================================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+.pnpm-store/
+
+# ===========================================
+# ARCHIVOS DE BUILD Y DISTRIBUCIÓN
+# ===========================================
+dist/
+build/
+.vite/
+.next/
+.nuxt/
+out/
+storybook-static/
+
+# ===========================================
+# VARIABLES DE ENTORNO
+# ===========================================
+.env
+.env.*
+!.env.example
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# ===========================================
+# LOGS Y ARCHIVOS TEMPORALES
+# ===========================================
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+
+# Runtime data
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# ===========================================
+# CACHÉ Y ARCHIVOS TEMPORALES
+# ===========================================
+.cache/
+.parcel-cache/
+.npm/
+.eslintcache
+*.tsbuildinfo
+.rpt2_cache/
+.rts2_cache_cjs/
+.rts2_cache_es/
+.rts2_cache_umd/
+.node_repl_history
+*.tgz
+.yarn-integrity
+
+# ===========================================
+# TESTING Y COVERAGE
+# ===========================================
+coverage/
+*.lcov
+.nyc_output/
+test-results/
+playwright-report/
+junit.xml
+
+# ===========================================
+# EDITORES E IDEs
+# ===========================================
+.vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.idea/
+*.swp
+*.swo
+*~
+*.sublime-project
+*.sublime-workspace
+
+# ===========================================
+# SISTEMA OPERATIVO
+# ===========================================
+# macOS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# ===========================================
+# ARCHIVOS DE BACKUP Y TEMPORALES
+# ===========================================
+*.bak
+*.backup
+*.old
+*.tmp
+*.temp
+tmp/
+temp/
+
+# ===========================================
+# ARCHIVOS ESPECÍFICOS DEL PROYECTO
+# ===========================================
+# Uploads y archivos de usuario
+backend/uploads/
+frontend/public/uploads/
+
+# Archivos de configuración local
+config/local.js
+config/local.json
+
+# Archivos de base de datos local
+*.sqlite
+*.sqlite3
+*.db
+
+# ===========================================
+# MONOREPO - ESTRUCTURA ESPECÍFICA
+# ===========================================
+# Mantener package-lock.json para consistencia
+# package-lock.json
+# yarn.lock
+# pnpm-lock.yaml
+
+# Node modules en subproyectos
+frontend/node_modules/
+backend/node_modules/
+
+# Build outputs específicos
+frontend/dist/
+frontend/build/
+backend/dist/
+backend/build/
+
+# ===========================================
+# DOCUMENTACIÓN GENERADA
+# ===========================================
+docs/build/
+docs/_build/
+site/
