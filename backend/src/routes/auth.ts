@@ -10,7 +10,7 @@ const router = express.Router();
 const generateToken = (userId: string): string => {
   return jwt.sign(
     { userId },
-    'universidad-secret-key-2024',
+    process.env.JWT_SECRET || 'servicios_store_secret_key_2024_secure',
     { expiresIn: '24h' }
   );
 };
@@ -29,7 +29,7 @@ router.post('/register', [
   body('password')
     .isLength({ min: 6 })
     .withMessage('La contraseña debe tener al menos 6 caracteres')
-], async (req, res) => {
+], async (req: express.Request, res: express.Response) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -59,9 +59,9 @@ router.post('/register', [
     await user.save();
 
     // Generar token
-    const token = generateToken(user._id);
+    const token = generateToken((user._id as any).toString());
 
-    res.status(201).json({
+    return res.status(201).json({
       message: 'Usuario registrado exitosamente',
       token,
       user: {
@@ -73,7 +73,7 @@ router.post('/register', [
     });
   } catch (error) {
     console.error('Error en registro:', error);
-    res.status(500).json({ message: 'Error interno del servidor' });
+    return res.status(500).json({ message: 'Error interno del servidor' });
   }
 });
 
@@ -86,7 +86,7 @@ router.post('/login', [
   body('password')
     .notEmpty()
     .withMessage('La contraseña es requerida')
-], async (req, res) => {
+], async (req: express.Request, res: express.Response) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -108,9 +108,9 @@ router.post('/login', [
     }
 
     // Generar token
-    const token = generateToken(user._id);
+    const token = generateToken((user._id as any).toString());
 
-    res.json({
+    return res.json({
       message: 'Login exitoso',
       token,
       user: {
@@ -122,7 +122,7 @@ router.post('/login', [
     });
   } catch (error) {
     console.error('Error en login:', error);
-    res.status(500).json({ message: 'Error interno del servidor' });
+    return res.status(500).json({ message: 'Error interno del servidor' });
   }
 });
 
@@ -134,16 +134,16 @@ router.get('/profile', authenticateToken, async (req, res) => {
       return res.status(404).json({ message: 'Usuario no encontrado' });
     }
 
-    res.json({ user });
+    return res.json({ user });
   } catch (error) {
     console.error('Error obteniendo perfil:', error);
-    res.status(500).json({ message: 'Error interno del servidor' });
+    return res.status(500).json({ message: 'Error interno del servidor' });
   }
 });
 
 // Verificar token
-router.get('/verify', authenticateToken, (req, res) => {
-  res.json({ valid: true, userId: req.userId });
+router.get('/verify', authenticateToken, (req: express.Request, res: express.Response) => {
+  return res.json({ valid: true, userId: req.userId });
 });
 
 export default router;

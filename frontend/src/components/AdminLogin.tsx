@@ -5,6 +5,7 @@ import { Label } from './ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Alert, AlertDescription } from './ui/alert';
 import { ArrowLeft, Lock, User, AlertCircle } from 'lucide-react';
+import { apiService, LoginRequest } from '../services/api';
 
 interface AdminLoginProps {
   onLogin: (success: boolean) => void;
@@ -13,17 +14,11 @@ interface AdminLoginProps {
 
 export function AdminLogin({ onLogin, onBackToHome }: AdminLoginProps) {
   const [formData, setFormData] = useState({
-    username: '',
+    email: '',
     password: ''
   });
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-
-  // Credenciales por defecto para demostración
-  const ADMIN_CREDENTIALS = {
-    username: 'admin',
-    password: 'techsphere2024'
-  };
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({
@@ -39,27 +34,36 @@ export function AdminLogin({ onLogin, onBackToHome }: AdminLoginProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.username || !formData.password) {
-      setError('Por favor ingrese usuario y contraseña');
+    if (!formData.email || !formData.password) {
+      setError('Por favor ingrese email y contraseña');
       return;
     }
 
     setIsLoading(true);
     setError('');
 
-    // Simular llamada de autenticación
-    setTimeout(() => {
-      if (
-        formData.username === ADMIN_CREDENTIALS.username &&
-        formData.password === ADMIN_CREDENTIALS.password
-      ) {
+    try {
+      const loginData: LoginRequest = {
+        email: formData.email,
+        password: formData.password
+      };
+
+      const response = await apiService.login(loginData);
+      
+      // Verificar que el usuario es admin
+      if (response.user.role === 'admin') {
         onLogin(true);
       } else {
-        setError('Usuario o contraseña incorrectos. Intente nuevamente.');
+        setError('Acceso denegado. Se requieren permisos de administrador.');
+        apiService.logout();
         onLogin(false);
       }
+    } catch (error) {
+      setError(error instanceof Error ? error.message : 'Error en el login');
+      onLogin(false);
+    } finally {
       setIsLoading(false);
-    }, 1000);
+    }
   };
 
   const handleForgotPassword = () => {
@@ -97,18 +101,18 @@ export function AdminLogin({ onLogin, onBackToHome }: AdminLoginProps) {
 
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
-              {/* Campo Usuario */}
+              {/* Campo Email */}
               <div className="space-y-2">
-                <Label htmlFor="username">Usuario</Label>
+                <Label htmlFor="email">Email</Label>
                 <div className="relative">
                   <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                   <Input
-                    id="username"
-                    type="text"
-                    value={formData.username}
-                    onChange={(e) => handleInputChange('username', e.target.value)}
+                    id="email"
+                    type="email"
+                    value={formData.email}
+                    onChange={(e) => handleInputChange('email', e.target.value)}
                     className="pl-10 bg-input-background border-gray-200 focus:border-primary focus:ring-1 focus:ring-primary"
-                    placeholder="Ingrese su usuario"
+                    placeholder="Ingrese su email"
                     disabled={isLoading}
                   />
                 </div>
@@ -171,11 +175,11 @@ export function AdminLogin({ onLogin, onBackToHome }: AdminLoginProps) {
           </CardContent>
         </Card>
 
-        {/* Información de demostración */}
+        {/* Información de credenciales */}
         <div className="mt-6 p-4 bg-white/50 rounded-lg text-center text-sm text-gray-600">
-          <p className="font-medium mb-2">Credenciales de demostración:</p>
-          <p><strong>Usuario:</strong> admin</p>
-          <p><strong>Contraseña:</strong> techsphere2024</p>
+          <p className="font-medium mb-2">Credenciales de administrador:</p>
+          <p><strong>Email:</strong> admin@serviciosstore.com</p>
+          <p><strong>Contraseña:</strong> admin123456</p>
         </div>
       </div>
     </div>

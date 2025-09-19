@@ -21,7 +21,7 @@ export const authenticateToken = async (req: Request, res: Response, next: NextF
       return res.status(401).json({ message: 'Token de acceso requerido' });
     }
 
-    const decoded = jwt.verify(token, 'universidad-secret-key-2024') as { userId: string };
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'servicios_store_secret_key_2024_secure') as { userId: string };
     
     // Verificar que el usuario existe y está activo
     const user = await User.findById(decoded.userId).select('-password');
@@ -31,7 +31,7 @@ export const authenticateToken = async (req: Request, res: Response, next: NextF
 
     req.userId = decoded.userId;
     req.user = user;
-    next();
+    return next();
   } catch (error) {
     if (error instanceof jwt.JsonWebTokenError) {
       return res.status(401).json({ message: 'Token inválido' });
@@ -41,7 +41,7 @@ export const authenticateToken = async (req: Request, res: Response, next: NextF
     }
     
     console.error('Error en autenticación:', error);
-    res.status(500).json({ message: 'Error interno del servidor' });
+    return res.status(500).json({ message: 'Error interno del servidor' });
   }
 };
 
@@ -49,5 +49,5 @@ export const requireAdmin = (req: Request, res: Response, next: NextFunction) =>
   if (!req.user || req.user.role !== 'admin') {
     return res.status(403).json({ message: 'Acceso denegado. Se requieren permisos de administrador.' });
   }
-  next();
+  return next();
 };

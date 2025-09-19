@@ -1,13 +1,15 @@
 import mongoose from 'mongoose';
 
-const MONGODB_URI = 'mongodb://localhost:27017/home-page-university';
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/servicios_store';
 
 export const connectDB = async (): Promise<void> => {
   try {
     const conn = await mongoose.connect(MONGODB_URI);
     console.log(`✅ MongoDB conectado: ${conn.connection.host}`);
+    console.log(`📊 Base de datos: ${conn.connection.name}`);
   } catch (error) {
     console.error('❌ Error conectando a MongoDB:', error);
+    console.log('💡 Asegúrate de que MongoDB esté ejecutándose en tu sistema');
     process.exit(1);
   }
 };

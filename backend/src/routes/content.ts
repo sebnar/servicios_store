@@ -4,7 +4,7 @@ import Content from '../models/Content';
 const router = express.Router();
 
 // Obtener contenido público por tipo
-router.get('/:type', async (req, res) => {
+router.get('/:type', async (req: express.Request, res: express.Response) => {
   try {
     const { type } = req.params;
     
@@ -19,15 +19,15 @@ router.get('/:type', async (req, res) => {
       isActive: true 
     }).sort({ order: 1, createdAt: -1 });
 
-    res.json({ content });
+    return res.json({ content });
   } catch (error) {
     console.error('Error obteniendo contenido:', error);
-    res.status(500).json({ message: 'Error interno del servidor' });
+    return res.status(500).json({ message: 'Error interno del servidor' });
   }
 });
 
 // Obtener todo el contenido público
-router.get('/', async (req, res) => {
+router.get('/', async (req: express.Request, res: express.Response) => {
   try {
     const content = await Content.find({ isActive: true })
       .sort({ order: 1, createdAt: -1 });
@@ -41,15 +41,15 @@ router.get('/', async (req, res) => {
       return acc;
     }, {} as Record<string, any[]>);
 
-    res.json({ content: groupedContent });
+    return res.json({ content: groupedContent });
   } catch (error) {
     console.error('Error obteniendo todo el contenido:', error);
-    res.status(500).json({ message: 'Error interno del servidor' });
+    return res.status(500).json({ message: 'Error interno del servidor' });
   }
 });
 
 // Obtener contenido específico por ID (público)
-router.get('/item/:id', async (req, res) => {
+router.get('/item/:id', async (req: express.Request, res: express.Response) => {
   try {
     const { id } = req.params;
     const content = await Content.findOne({ _id: id, isActive: true });
@@ -58,10 +58,10 @@ router.get('/item/:id', async (req, res) => {
       return res.status(404).json({ message: 'Contenido no encontrado' });
     }
 
-    res.json({ content });
+    return res.json({ content });
   } catch (error) {
     console.error('Error obteniendo contenido por ID:', error);
-    res.status(500).json({ message: 'Error interno del servidor' });
+    return res.status(500).json({ message: 'Error interno del servidor' });
   }
 });
 

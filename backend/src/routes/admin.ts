@@ -24,7 +24,7 @@ router.get('/users', async (req, res) => {
 // Actualizar estado de usuario
 router.patch('/users/:id/status', [
   body('isActive').isBoolean().withMessage('isActive debe ser un booleano')
-], async (req, res) => {
+], async (req: express.Request, res: express.Response) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -44,21 +44,21 @@ router.patch('/users/:id/status', [
       return res.status(404).json({ message: 'Usuario no encontrado' });
     }
 
-    res.json({ message: 'Estado de usuario actualizado', user });
+    return res.json({ message: 'Estado de usuario actualizado', user });
   } catch (error) {
     console.error('Error actualizando usuario:', error);
-    res.status(500).json({ message: 'Error interno del servidor' });
+    return res.status(500).json({ message: 'Error interno del servidor' });
   }
 });
 
 // Obtener todo el contenido
-router.get('/content', async (req, res) => {
+router.get('/content', async (req: express.Request, res: express.Response) => {
   try {
     const content = await Content.find({}).sort({ order: 1, createdAt: -1 });
-    res.json({ content });
+    return res.json({ content });
   } catch (error) {
     console.error('Error obteniendo contenido:', error);
-    res.status(500).json({ message: 'Error interno del servidor' });
+    return res.status(500).json({ message: 'Error interno del servidor' });
   }
 });
 
@@ -69,7 +69,7 @@ router.post('/content', [
   body('title').notEmpty().withMessage('El título es requerido'),
   body('description').notEmpty().withMessage('La descripción es requerida'),
   body('order').optional().isInt({ min: 0 }).withMessage('El orden debe ser un número entero positivo')
-], async (req, res) => {
+], async (req: express.Request, res: express.Response) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -79,10 +79,10 @@ router.post('/content', [
     const content = new Content(req.body);
     await content.save();
 
-    res.status(201).json({ message: 'Contenido creado exitosamente', content });
+    return res.status(201).json({ message: 'Contenido creado exitosamente', content });
   } catch (error) {
     console.error('Error creando contenido:', error);
-    res.status(500).json({ message: 'Error interno del servidor' });
+    return res.status(500).json({ message: 'Error interno del servidor' });
   }
 });
 
@@ -93,7 +93,7 @@ router.put('/content/:id', [
   body('title').optional().notEmpty().withMessage('El título no puede estar vacío'),
   body('description').optional().notEmpty().withMessage('La descripción no puede estar vacía'),
   body('order').optional().isInt({ min: 0 }).withMessage('El orden debe ser un número entero positivo')
-], async (req, res) => {
+], async (req: express.Request, res: express.Response) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -111,15 +111,15 @@ router.put('/content/:id', [
       return res.status(404).json({ message: 'Contenido no encontrado' });
     }
 
-    res.json({ message: 'Contenido actualizado exitosamente', content });
+    return res.json({ message: 'Contenido actualizado exitosamente', content });
   } catch (error) {
     console.error('Error actualizando contenido:', error);
-    res.status(500).json({ message: 'Error interno del servidor' });
+    return res.status(500).json({ message: 'Error interno del servidor' });
   }
 });
 
 // Eliminar contenido
-router.delete('/content/:id', async (req, res) => {
+router.delete('/content/:id', async (req: express.Request, res: express.Response) => {
   try {
     const { id } = req.params;
     const content = await Content.findByIdAndDelete(id);
@@ -128,10 +128,10 @@ router.delete('/content/:id', async (req, res) => {
       return res.status(404).json({ message: 'Contenido no encontrado' });
     }
 
-    res.json({ message: 'Contenido eliminado exitosamente' });
+    return res.json({ message: 'Contenido eliminado exitosamente' });
   } catch (error) {
     console.error('Error eliminando contenido:', error);
-    res.status(500).json({ message: 'Error interno del servidor' });
+    return res.status(500).json({ message: 'Error interno del servidor' });
   }
 });
 
@@ -143,7 +143,7 @@ router.get('/stats', async (req, res) => {
     const totalContent = await Content.countDocuments();
     const activeContent = await Content.countDocuments({ isActive: true });
 
-    res.json({
+    return res.json({
       stats: {
         totalUsers,
         activeUsers,
@@ -153,7 +153,7 @@ router.get('/stats', async (req, res) => {
     });
   } catch (error) {
     console.error('Error obteniendo estadísticas:', error);
-    res.status(500).json({ message: 'Error interno del servidor' });
+    return res.status(500).json({ message: 'Error interno del servidor' });
   }
 });
 
