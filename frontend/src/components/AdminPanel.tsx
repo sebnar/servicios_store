@@ -1,3 +1,4 @@
+import React, { useState } from 'react';
 import { Button } from './ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Badge } from './ui/badge';
@@ -9,19 +10,148 @@ import {
   LogOut, 
   Plus,
   Edit,
-  Trash2
+  Trash2,
+  ArrowLeft
 } from 'lucide-react';
+import { ServiceManagement } from './ServiceManagement';
+import { useServices } from '../hooks/useServices';
+import { apiService } from '../services/api';
 
 interface AdminPanelProps {
   onLogout: () => void;
 }
 
 export function AdminPanel({ onLogout }: AdminPanelProps) {
+  const [currentView, setCurrentView] = useState<'dashboard' | 'services'>('dashboard');
+  const { services, loading, refetch } = useServices({ limit: 100 });
+
   const handleLogout = () => {
     if (confirm('¿Está seguro que desea cerrar sesión?')) {
       onLogout();
     }
   };
+
+  const handleCreateService = async (serviceData: any) => {
+    try {
+      const response = await fetch('http://localhost:5000/api/admin/services', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiService.getToken()}`
+        },
+        body: JSON.stringify(serviceData)
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Error al crear servicio');
+      }
+
+      alert('Servicio creado exitosamente');
+    } catch (error) {
+      alert(`Error: ${error instanceof Error ? error.message : 'Error desconocido'}`);
+      throw error;
+    }
+  };
+
+  const handleUpdateService = async (id: string, serviceData: any) => {
+    try {
+      const response = await fetch(`http://localhost:5000/api/admin/services/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiService.getToken()}`
+        },
+        body: JSON.stringify(serviceData)
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Error al actualizar servicio');
+      }
+
+      alert('Servicio actualizado exitosamente');
+    } catch (error) {
+      alert(`Error: ${error instanceof Error ? error.message : 'Error desconocido'}`);
+      throw error;
+    }
+  };
+
+  const handleDeleteService = async (id: string) => {
+    try {
+      const response = await fetch(`http://localhost:5000/api/admin/services/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${apiService.getToken()}`
+        }
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Error al eliminar servicio');
+      }
+
+      alert('Servicio eliminado exitosamente');
+    } catch (error) {
+      alert(`Error: ${error instanceof Error ? error.message : 'Error desconocido'}`);
+      throw error;
+    }
+  };
+
+  // Vista de gestión de servicios
+  if (currentView === 'services') {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        {/* Header del panel */}
+        <div className="bg-white shadow-sm border-b">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex justify-between items-center h-16">
+              <div className="flex items-center gap-4">
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => setCurrentView('dashboard')}
+                >
+                  <ArrowLeft className="h-4 w-4 mr-2" />
+                  Volver al Dashboard
+                </Button>
+                <div>
+                  <h1 className="text-primary">Gestión de Servicios</h1>
+                  <p className="text-sm text-gray-600">Administre el catálogo de servicios</p>
+                </div>
+              </div>
+              
+              <div className="flex items-center gap-4">
+                <Badge variant="secondary" className="bg-green-100 text-green-800">
+                  En línea
+                </Badge>
+                <Button 
+                  variant="outline" 
+                  onClick={handleLogout}
+                  className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                >
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Cerrar Sesión
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Contenido de gestión de servicios */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <ServiceManagement
+            services={services}
+            loading={loading}
+            onRefresh={refetch}
+            onCreateService={handleCreateService}
+            onUpdateService={handleUpdateService}
+            onDeleteService={handleDeleteService}
+          />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -124,18 +254,17 @@ export function AdminPanel({ onLogout }: AdminPanelProps) {
                 Administre el catálogo de servicios, precios y disponibilidad
               </p>
               <div className="flex gap-2">
-                <Button size="sm" className="bg-primary hover:bg-primary/90">
+                <Button 
+                  size="sm" 
+                  className="bg-primary hover:bg-primary/90"
+                  onClick={() => setCurrentView('services')}
+                >
                   <Plus className="h-4 w-4 mr-2" />
-                  Nuevo Servicio
+                  Gestionar Servicios
                 </Button>
-                <Button variant="outline" size="sm">
-                  <Edit className="h-4 w-4 mr-2" />
-                  Editar
-                </Button>
-                <Button variant="outline" size="sm" className="text-red-600 hover:text-red-700">
-                  <Trash2 className="h-4 w-4 mr-2" />
-                  Eliminar
-                </Button>
+                <Badge variant="secondary">
+                  {services.length} servicios
+                </Badge>
               </div>
             </CardContent>
           </Card>

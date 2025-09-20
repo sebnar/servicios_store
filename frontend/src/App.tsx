@@ -11,17 +11,12 @@ import { Footer } from './components/Footer';
 
 export default function App() {
   const [currentView, setCurrentView] = useState<'home' | 'service-detail' | 'admin-login' | 'admin-panel'>('home');
-  const [selectedServiceId, setSelectedServiceId] = useState<number | null>(null);
+  const [selectedServiceId, setSelectedServiceId] = useState<string | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  const handleServiceClick = (serviceId: number) => {
-    // Solo mostramos el detalle para el servicio de Desarrollo Web (id: 1)
-    if (serviceId === 1) {
-      setSelectedServiceId(serviceId);
-      setCurrentView('service-detail');
-    } else {
-      alert(`Detalle próximamente disponible para el servicio ${serviceId}`);
-    }
+  const handleServiceClick = (serviceId: string) => {
+    setSelectedServiceId(serviceId);
+    setCurrentView('service-detail');
   };
 
   const handleBackToServices = () => {
@@ -30,7 +25,7 @@ export default function App() {
   };
 
   const handleRequestQuote = () => {
-    alert('¡Gracias por tu interés! Nos pondremos en contacto contigo pronto para discutir tu proyecto de desarrollo web.');
+    alert('¡Gracias por tu interés! Nos pondremos en contacto contigo pronto para discutir tu proyecto.');
   };
 
   const handleLoginClick = () => {
@@ -72,7 +67,7 @@ export default function App() {
   }
 
   // Vista de Detalle de Servicio
-  if (currentView === 'service-detail' && selectedServiceId === 1) {
+  if (currentView === 'service-detail' && selectedServiceId) {
     return (
       <div className="min-h-screen bg-white">
         {/* Navbar */}
@@ -80,6 +75,7 @@ export default function App() {
         
         {/* Service Detail */}
         <ServiceDetail 
+          serviceId={selectedServiceId}
           onBack={handleBackToServices}
           onRequestQuote={handleRequestQuote}
         />

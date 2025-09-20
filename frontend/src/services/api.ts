@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://localhost:5000/api';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
 
 export interface LoginRequest {
   email: string;
@@ -22,6 +22,45 @@ export interface AuthResponse {
   message: string;
   token: string;
   user: User;
+}
+
+export interface Service {
+  _id: string;
+  name: string;
+  description: string;
+  shortDescription?: string;
+  price: number;
+  currency: string;
+  category: string;
+  subcategory?: string;
+  images: string[];
+  features: string[];
+  duration?: string;
+  availability: {
+    isAvailable: boolean;
+    schedule?: string;
+    maxBookings?: number;
+  };
+  isActive: boolean;
+  isFeatured: boolean;
+  order: number;
+  tags: string[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ServicesResponse {
+  services: Service[];
+  pagination: {
+    currentPage: number;
+    totalPages: number;
+    totalItems: number;
+    itemsPerPage: number;
+  };
+}
+
+export interface CategoriesResponse {
+  categories: string[];
 }
 
 class ApiService {
@@ -118,6 +157,97 @@ class ApiService {
 
   getToken(): string | null {
     return localStorage.getItem('authToken');
+  }
+
+  // Servicios API
+  async getServices(params?: {
+    category?: string;
+    featured?: boolean;
+    search?: string;
+    limit?: number;
+    page?: number;
+  }): Promise<ServicesResponse> {
+    const queryParams = new URLSearchParams();
+    
+    if (params?.category) queryParams.append('category', params.category);
+    if (params?.featured !== undefined) queryParams.append('featured', params.featured.toString());
+    if (params?.search) queryParams.append('search', params.search);
+    if (params?.limit) queryParams.append('limit', params.limit.toString());
+    if (params?.page) queryParams.append('page', params.page.toString());
+
+    const url = `${API_BASE_URL}/services${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+    
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Error obteniendo servicios');
+    }
+
+    return response.json();
+  }
+
+  async getServiceById(id: string): Promise<{ service: Service }> {
+    const response = await fetch(`${API_BASE_URL}/services/${id}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Error obteniendo servicio');
+    }
+
+    return response.json();
+  }
+
+  async getServicesByCategory(category: string, params?: {
+    limit?: number;
+    page?: number;
+  }): Promise<ServicesResponse & { category: string }> {
+    const queryParams = new URLSearchParams();
+    
+    if (params?.limit) queryParams.append('limit', params.limit.toString());
+    if (params?.page) queryParams.append('page', params.page.toString());
+
+    const url = `${API_BASE_URL}/services/category/${encodeURIComponent(category)}${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+    
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Error obteniendo servicios por categoría');
+    }
+
+    return response.json();
+  }
+
+  async getCategories(): Promise<CategoriesResponse> {
+    const response = await fetch(`${API_BASE_URL}/services/categories`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Error obteniendo categorías');
+    }
+
+    return response.json();
   }
 }
 

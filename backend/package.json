@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "nodemon src/index.ts",
     "start": "nodemon src/index.ts",
-    "init-admin": "ts-node src/scripts/initAdmin.ts"
+    "init-admin": "ts-node src/scripts/initAdmin.ts",
+    "init-services": "ts-node src/scripts/initServices.ts"
   },
   "dependencies": {
     "express": "^4.18.2",
