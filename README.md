@@ -6,21 +6,31 @@ Aplicación web full-stack para gestión de servicios con React + Express + Type
 
 ### Prerrequisitos
 - **Node.js** (versión 16+)
-- **MongoDB** (opcional)
+- **MongoDB** ejecutándose en el puerto 27017
 
-### Lanzamiento Automático
+### ⚡ Inicio Automático (Recomendado)
 ```bash
-# Windows
+# Windows - Ejecuta este archivo
 start.bat
-
-# Linux/Mac
-chmod +x start.sh && ./start.sh
 ```
 
-### Lanzamiento Manual
+### 🔧 Inicio Manual (Si el automático falla)
 ```bash
-npm run install  # Instalar dependencias
-npm start        # Iniciar aplicación
+# 1. Instalar dependencias (solo la primera vez)
+npm run install
+
+# 2. Inicializar usuario administrador (solo la primera vez)
+cd backend
+npm run init-admin
+cd ..
+
+# 3. Iniciar backend (Terminal 1)
+cd backend
+npm run dev
+
+# 4. Iniciar frontend (Terminal 2)
+cd frontend
+npm run dev
 ```
 
 ## 🌐 Acceso
@@ -28,14 +38,24 @@ npm start        # Iniciar aplicación
 - **Backend:** http://localhost:5000
 - **Health Check:** http://localhost:5000/api/health
 
+## 👤 Credenciales de Administrador
+- **Email:** admin@serviciosstore.com
+- **Contraseña:** admin123456
+
+> ⚠️ **Importante:** Si es la primera vez que ejecutas el proyecto, asegúrate de ejecutar `npm run init-admin` en la carpeta backend para crear el usuario administrador.
+
 ## 🛠️ Scripts Disponibles
 
 | Comando | Descripción |
 |---------|-------------|
-| `npm start` | Inicia frontend y backend |
-| `npm run frontend` | Solo frontend (puerto 3000) |
-| `npm run backend` | Solo backend (puerto 5000) |
+| `start.bat` | **Inicio automático** (Windows) - Recomendado |
 | `npm run install` | Instala todas las dependencias |
+| `npm run init-admin` | Crea usuario administrador (backend) |
+| `npm run dev` | Inicia servidor (backend o frontend) |
+
+### Scripts por Carpeta
+- **Backend:** `npm run dev` (puerto 5000)
+- **Frontend:** `npm run dev` (puerto 3000)
 
 ## 🏗️ Tecnologías
 
@@ -85,6 +105,30 @@ NODE_ENV=development
 ### Modelos
 - **User:** username, email, password, role, isActive
 - **Content:** type, title, subtitle, description, images, isActive
+
+## 🔧 Solución de Problemas
+
+### ❌ Error: "Puerto 5000 en uso"
+```bash
+# Buscar y terminar proceso
+netstat -ano | findstr "5000"
+taskkill /PID [número_del_proceso] /F
+```
+
+### ❌ Error: "MongoDB no conecta"
+- Verificar que MongoDB esté ejecutándose: `netstat -an | findstr "27017"`
+- Iniciar MongoDB: `net start MongoDB` (Windows)
+
+### ❌ Error: "ERR_CONNECTION_REFUSED"
+- Verificar que ambos servidores estén ejecutándose
+- Backend: http://localhost:5000/api/health
+- Frontend: http://localhost:3000
+
+### ❌ Error: "concurrently no se reconoce"
+```bash
+# Instalar dependencia globalmente
+npm install -g concurrently
+```
 
 ---
 
