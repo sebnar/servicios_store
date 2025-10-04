@@ -14,9 +14,15 @@ WORKDIR /app
 COPY backend/package*.json ./backend/
 COPY backend/ ./backend/
 
-# Instalar dependencias del backend
+# Instalar dependencias del backend (incluyendo devDependencies para compilar)
 WORKDIR /app/backend
-RUN npm ci --only=production
+RUN npm ci
+
+# Compilar TypeScript
+RUN npm run build
+
+# Instalar solo dependencias de producción
+RUN npm ci --only=production && npm cache clean --force
 
 # Volver al directorio raíz
 WORKDIR /app

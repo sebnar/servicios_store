@@ -5,7 +5,8 @@
   "main": "dist/index.js",
   "scripts": {
     "dev": "nodemon src/index.ts",
-    "start": "nodemon src/index.ts",
+    "start": "node dist/index.js",
+    "build": "tsc",
     "init-admin": "ts-node src/scripts/initAdmin.ts",
     "init-services": "ts-node src/scripts/initServices.ts"
   },
