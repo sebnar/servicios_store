@@ -46,6 +46,9 @@ RUN npm run build || \
 # Volver al directorio raíz
 WORKDIR /app
 
+# Crear directorio de configuración de nginx
+RUN mkdir -p /etc/nginx/conf.d
+
 # Crear configuración de nginx
 RUN echo 'server {\n\
     listen 80;\n\
