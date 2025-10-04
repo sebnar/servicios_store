@@ -72,28 +72,28 @@ RUN echo 'server {\n\
 }' > /etc/nginx/conf.d/default.conf
 
 # Crear script de inicio
-RUN echo '#!/bin/bash\n\
-echo "🚀 Iniciando Servicios Store - Frontend + Backend"\n\
-\n\
-# Iniciar backend en background\n\
-cd /app/backend\n\
-npm start &\n\
-BACKEND_PID=$!\n\
-\n\
-# Esperar a que el backend esté listo\n\
-sleep 5\n\
-\n\
-# Iniciar nginx\n\
-nginx -g "daemon off;" &\n\
-NGINX_PID=$!\n\
-\n\
-echo "✅ Servicios iniciados correctamente!"\n\
-echo "🌐 Frontend: http://localhost"\n\
-echo "🔧 Backend API: http://localhost/api"\n\
-\n\
-# Mantener el script ejecutándose\n\
-wait\n\
-' > /app/start.sh && chmod +x /app/start.sh
+RUN echo '#!/bin/bash' > /app/start.sh && \
+    echo 'echo "🚀 Iniciando Servicios Store - Frontend + Backend"' >> /app/start.sh && \
+    echo '' >> /app/start.sh && \
+    echo '# Iniciar backend en background' >> /app/start.sh && \
+    echo 'cd /app/backend' >> /app/start.sh && \
+    echo 'npm start &' >> /app/start.sh && \
+    echo 'BACKEND_PID=$!' >> /app/start.sh && \
+    echo '' >> /app/start.sh && \
+    echo '# Esperar a que el backend esté listo' >> /app/start.sh && \
+    echo 'sleep 5' >> /app/start.sh && \
+    echo '' >> /app/start.sh && \
+    echo '# Iniciar nginx' >> /app/start.sh && \
+    echo 'nginx -g "daemon off;" &' >> /app/start.sh && \
+    echo 'NGINX_PID=$!' >> /app/start.sh && \
+    echo '' >> /app/start.sh && \
+    echo 'echo "✅ Servicios iniciados correctamente!"' >> /app/start.sh && \
+    echo 'echo "🌐 Frontend: http://localhost"' >> /app/start.sh && \
+    echo 'echo "🔧 Backend API: http://localhost/api"' >> /app/start.sh && \
+    echo '' >> /app/start.sh && \
+    echo '# Mantener el script ejecutándose' >> /app/start.sh && \
+    echo 'wait' >> /app/start.sh && \
+    chmod +x /app/start.sh
 
 # Variables de entorno
 ENV NODE_ENV=production
