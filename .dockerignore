@@ -21,3 +21,8 @@ docker-compose*.yml
 nginx/
 DOCKER_DEPLOYMENT.md
 README_DOCKER.md
+README_SIMPLE_DOCKER.md
+RENDER_DEPLOYMENT.md
+start-all.sh
+init-database.js
+frontend/
