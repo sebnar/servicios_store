@@ -16,7 +16,7 @@ Thumbs.db
 coverage
 .nyc_output
 *.bat
-*.sh
+start-all.sh
 docker-compose*.yml
 nginx/
 DOCKER_DEPLOYMENT.md
