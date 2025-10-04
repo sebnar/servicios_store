@@ -32,6 +32,9 @@ RUN npm ci --only=production && npm cache clean --force
 WORKDIR /app/frontend
 RUN npm ci
 
+# Configurar variables de entorno para el build
+ENV VITE_API_URL=http://localhost:5000/api
+
 # Construir el frontend
 RUN npm run build
 
