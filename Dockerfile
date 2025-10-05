@@ -71,9 +71,11 @@ RUN echo 'server {\n\
     }\n\
 }' > /etc/nginx/conf.d/default.conf
 
-# Copiar script de inicio
-COPY start.sh /app/start.sh
-RUN chmod +x /app/start.sh
+# Copiar script de inicio robusto
+COPY start-robust.sh /app/start.sh
+RUN chmod +x /app/start.sh && \
+    ls -la /app/start.sh && \
+    file /app/start.sh
 
 # Variables de entorno
 ENV NODE_ENV=production
