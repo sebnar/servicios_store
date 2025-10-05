@@ -29,7 +29,7 @@ WORKDIR /app/frontend
 RUN npm ci
 
 # Configurar variables de entorno para el build
-ENV VITE_API_URL=http://localhost:5000/api
+ENV VITE_API_BASE_URL=http://localhost:5000/api
 
 # Intentar construir el frontend con diferentes estrategias
 RUN npm run build || \
@@ -78,5 +78,5 @@ ENV PORT=5000
 # Exponer puertos
 EXPOSE 80 5000
 
-# Comando de inicio mejorado
-CMD ["dumb-init", "sh", "-c", "cd /app/backend && npm start & sleep 5 && nginx -g 'daemon off;' & wait"]
+# Comando de inicio con debugging
+CMD ["dumb-init", "sh", "-c", "echo '🚀 Iniciando servicios...' && cd /app/backend && echo '🔧 Iniciando backend...' && npm start & sleep 5 && echo '🌐 Iniciando nginx...' && nginx -g 'daemon off;' & echo '✅ Servicios iniciados' && wait"]
