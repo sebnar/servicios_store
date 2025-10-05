@@ -88,28 +88,58 @@ router.post('/login', [
     .withMessage('La contraseña es requerida')
 ], async (req: express.Request, res: express.Response) => {
   try {
+    console.log('🔍 [LOGIN] Iniciando proceso de login...');
+    
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
+      console.log('❌ [LOGIN] Errores de validación:', errors.array());
       return res.status(400).json({ errors: errors.array() });
     }
 
     const { email, password } = req.body;
+    console.log('📧 [LOGIN] Email recibido:', email);
+    console.log('🔑 [LOGIN] Contraseña recibida:', password ? '[OCULTA]' : '[VACÍA]');
 
     // Buscar usuario
+    console.log('🔍 [LOGIN] Buscando usuario en la base de datos...');
     const user = await User.findOne({ email, isActive: true });
+    
     if (!user) {
+      console.log('❌ [LOGIN] Usuario no encontrado o inactivo');
+      console.log('🔍 [LOGIN] Verificando si existe usuario con email:', email);
+      const userExists = await User.findOne({ email });
+      if (userExists) {
+        console.log('⚠️ [LOGIN] Usuario existe pero está inactivo:', userExists.isActive);
+      } else {
+        console.log('❌ [LOGIN] Usuario no existe en la base de datos');
+      }
       return res.status(401).json({ message: 'Credenciales inválidas' });
     }
 
+    console.log('✅ [LOGIN] Usuario encontrado:', {
+      id: user._id,
+      username: user.username,
+      email: user.email,
+      role: user.role,
+      isActive: user.isActive
+    });
+
     // Verificar contraseña
+    console.log('🔍 [LOGIN] Verificando contraseña...');
     const isPasswordValid = await user.comparePassword(password);
+    console.log('🔑 [LOGIN] Contraseña válida:', isPasswordValid);
+    
     if (!isPasswordValid) {
+      console.log('❌ [LOGIN] Contraseña incorrecta');
       return res.status(401).json({ message: 'Credenciales inválidas' });
     }
 
     // Generar token
+    console.log('🎫 [LOGIN] Generando token...');
     const token = generateToken((user._id as any).toString());
+    console.log('✅ [LOGIN] Token generado exitosamente');
 
+    console.log('🎉 [LOGIN] Login exitoso para usuario:', user.email);
     return res.json({
       message: 'Login exitoso',
       token,
@@ -121,7 +151,7 @@ router.post('/login', [
       }
     });
   } catch (error) {
-    console.error('Error en login:', error);
+    console.error('❌ [LOGIN] Error en login:', error);
     return res.status(500).json({ message: 'Error interno del servidor' });
   }
 });
