@@ -74,8 +74,7 @@ RUN echo 'server {\n\
 # Copiar script de inicio robusto
 COPY start-robust.sh /app/start.sh
 RUN chmod +x /app/start.sh && \
-    ls -la /app/start.sh && \
-    file /app/start.sh
+    ls -la /app/start.sh
 
 # Variables de entorno
 ENV NODE_ENV=production
