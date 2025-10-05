@@ -14,8 +14,10 @@ export const connectDB = async (): Promise<void> => {
     console.log(`🔌 [DATABASE] Estado de conexión: ${conn.connection.readyState}`);
     
     // Verificar colecciones existentes
-    const collections = await conn.connection.db.listCollections().toArray();
-    console.log(`📋 [DATABASE] Colecciones disponibles:`, collections.map(c => c.name));
+    if (conn.connection.db) {
+      const collections = await conn.connection.db.listCollections().toArray();
+      console.log(`📋 [DATABASE] Colecciones disponibles:`, collections.map(c => c.name));
+    }
   } catch (error) {
     console.error('❌ [DATABASE] Error conectando a MongoDB:', error);
     console.log('💡 [DATABASE] Verifica que la variable MONGODB_URI esté configurada correctamente');
