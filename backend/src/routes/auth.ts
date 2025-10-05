@@ -126,6 +126,9 @@ router.post('/login', [
 
     // Verificar contraseña
     console.log('🔍 [LOGIN] Verificando contraseña...');
+    console.log('🔑 [LOGIN] Contraseña ingresada:', password);
+    console.log('🔑 [LOGIN] Contraseña almacenada en BD:', user.password);
+    console.log('🔑 [LOGIN] Longitud contraseña BD:', user.password.length);
     const isPasswordValid = await user.comparePassword(password);
     console.log('🔑 [LOGIN] Contraseña válida:', isPasswordValid);
     
