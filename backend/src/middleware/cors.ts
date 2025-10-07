@@ -46,19 +46,19 @@ export const corsResponseMiddleware = (req: Request, res: Response, next: NextFu
     res.setHeader('Access-Control-Allow-Credentials', 'false');
   };
   
-  res.send = function(data) {
+  res.send = function(data: any) {
     addCorsHeaders();
     console.log(`📤 [CORS-RESPONSE] ${req.method} ${req.path} - Status: ${res.statusCode}`);
     return originalSend.call(this, data);
   };
   
-  res.json = function(data) {
+  res.json = function(data: any) {
     addCorsHeaders();
     console.log(`📤 [CORS-RESPONSE] ${req.method} ${req.path} - Status: ${res.statusCode}`);
     return originalJson.call(this, data);
   };
   
-  res.sendFile = function(path, options, callback) {
+  res.sendFile = function(path: string, options?: any, callback?: any) {
     addCorsHeaders();
     console.log(`📤 [CORS-FILE] ${req.method} ${req.path} - Sending file: ${path}`);
     return originalSendFile.call(this, path, options, callback);
