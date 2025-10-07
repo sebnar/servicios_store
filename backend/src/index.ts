@@ -13,7 +13,7 @@ import adminServicesRoutes from './routes/admin-services';
 dotenv.config();
 
 const app = express();
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
 
 // Configuración CORS definitiva con logs detallados
 app.use((req, res, next) => {
@@ -138,9 +138,17 @@ app.use((err: any, req: express.Request, res: express.Response, next: express.Ne
   });
 });
 
-// Ruta 404
-app.use('*', (req, res) => {
-  res.status(404).json({ message: 'Ruta no encontrada' });
+// Servir archivos estáticos del frontend
+app.use(express.static('/app/frontend/dist'));
+
+// Ruta 404 - solo para API
+app.use('/api/*', (req, res) => {
+  res.status(404).json({ message: 'Ruta de API no encontrada' });
+});
+
+// Para todas las demás rutas, servir el frontend (SPA)
+app.get('*', (req, res) => {
+  res.sendFile('/app/frontend/dist/index.html');
 });
 
 // Iniciar servidor

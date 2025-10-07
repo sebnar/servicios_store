@@ -81,5 +81,5 @@ ENV PORT=5000
 # Exponer puertos
 EXPOSE 80 5000
 
-# Comando de inicio con logs de Nginx
-CMD ["dumb-init", "sh", "-c", "echo '🚀 Starting Servicios Store...' && cd /app/backend && echo '🔧 Building backend...' && npm run build && echo '🚀 Starting backend...' && npm start & echo '⏳ Waiting for backend...' && sleep 30 && echo '🌐 Starting Nginx...' && nginx -t && echo '✅ Nginx config OK' && nginx -g 'daemon off;' & echo '✅ All services started!' && wait"]
+# Comando de inicio simplificado - solo backend
+CMD ["dumb-init", "sh", "-c", "echo '🚀 Starting Servicios Store...' && cd /app/backend && echo '🔧 Building backend...' && npm run build && echo '🚀 Starting backend...' && npm start"]
