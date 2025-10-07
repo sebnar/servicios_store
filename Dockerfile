@@ -20,12 +20,12 @@ COPY frontend/ ./frontend/
 
 # Instalar dependencias del backend (mantener todas las dependencias)
 WORKDIR /app/backend
-RUN npm ci
+RUN npm install --no-audit --no-fund
 RUN npm run build
 
 # Instalar dependencias del frontend
 WORKDIR /app/frontend
-RUN npm ci
+RUN npm install --no-audit --no-fund
 
 # Configurar variables de entorno para el build del frontend
 ENV VITE_API_URL=https://servicios-store-middle.onrender.com/api
