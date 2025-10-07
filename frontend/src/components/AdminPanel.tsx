@@ -14,7 +14,9 @@ import {
   ArrowLeft
 } from 'lucide-react';
 import { ServiceManagement } from './ServiceManagement';
+import { QuotationList } from './QuotationList';
 import { useServices } from '../hooks/useServices';
+import { useAdminQuotations } from '../hooks/useQuotations';
 import { apiService } from '../services/api';
 
 interface AdminPanelProps {
@@ -22,8 +24,9 @@ interface AdminPanelProps {
 }
 
 export function AdminPanel({ onLogout }: AdminPanelProps) {
-  const [currentView, setCurrentView] = useState<'dashboard' | 'services'>('dashboard');
+  const [currentView, setCurrentView] = useState<'dashboard' | 'services' | 'quotations'>('dashboard');
   const { services, loading, refetch } = useServices({ limit: 100 });
+  const { quotations, loading: quotationsLoading, refetch: refetchQuotations } = useAdminQuotations({ limit: 100 });
 
   const handleLogout = () => {
     if (confirm('¿Está seguro que desea cerrar sesión?')) {
@@ -304,7 +307,12 @@ export function AdminPanel({ onLogout }: AdminPanelProps) {
                 </div>
               </div>
               
-              <Button variant="outline" size="sm" className="w-full">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="w-full"
+                onClick={() => setCurrentView('quotations')}
+              >
                 Ver Todas las Cotizaciones
               </Button>
             </CardContent>
@@ -327,4 +335,56 @@ export function AdminPanel({ onLogout }: AdminPanelProps) {
       </div>
     </div>
   );
+
+  // Vista de gestión de cotizaciones
+  if (currentView === 'quotations') {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        {/* Header del panel */}
+        <div className="bg-white shadow-sm border-b">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex justify-between items-center h-16">
+              <div className="flex items-center gap-4">
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => setCurrentView('dashboard')}
+                >
+                  <ArrowLeft className="h-4 w-4 mr-2" />
+                  Volver al Dashboard
+                </Button>
+                <div>
+                  <h1 className="text-primary">Gestión de Cotizaciones</h1>
+                  <p className="text-sm text-gray-600">Administre las solicitudes de cotización</p>
+                </div>
+              </div>
+              
+              <div className="flex items-center gap-4">
+                <Badge variant="secondary" className="bg-green-100 text-green-800">
+                  En línea
+                </Badge>
+                <Button 
+                  variant="outline" 
+                  onClick={handleLogout}
+                  className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                >
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Cerrar Sesión
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Contenido de gestión de cotizaciones */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <QuotationList
+            quotations={quotations}
+            loading={quotationsLoading}
+            onRefresh={refetchQuotations}
+          />
+        </div>
+      </div>
+    );
+  }
 }

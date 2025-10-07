@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { apiService } from './services/api';
 import { Navbar } from './components/Navbar';
 import { HeroSlider } from './components/HeroSlider';
 import { WelcomeSection } from './components/WelcomeSection';
@@ -6,11 +7,12 @@ import { ServicesSection } from './components/ServicesSection';
 import { ServiceDetail } from './components/ServiceDetail';
 import { AdminLogin } from './components/AdminLogin';
 import { AdminPanel } from './components/AdminPanel';
+import { QuotationForm } from './components/QuotationForm';
 import { MissionVisionSection } from './components/MissionVisionSection';
 import { Footer } from './components/Footer';
 
 export default function App() {
-  const [currentView, setCurrentView] = useState<'home' | 'service-detail' | 'admin-login' | 'admin-panel'>('home');
+  const [currentView, setCurrentView] = useState<'home' | 'service-detail' | 'admin-login' | 'admin-panel' | 'quotation'>('home');
   const [selectedServiceId, setSelectedServiceId] = useState<string | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
@@ -25,7 +27,22 @@ export default function App() {
   };
 
   const handleRequestQuote = () => {
-    alert('¡Gracias por tu interés! Nos pondremos en contacto contigo pronto para discutir tu proyecto.');
+    setCurrentView('quotation');
+  };
+
+  const handleCreateQuotation = async (quotationData: any) => {
+    try {
+      await apiService.createQuotation(quotationData);
+      alert('¡Cotización enviada exitosamente! Nos pondremos en contacto contigo pronto.');
+      setCurrentView('home');
+    } catch (error) {
+      alert('Error al enviar la cotización. Por favor, inténtalo de nuevo.');
+      console.error('Error creating quotation:', error);
+    }
+  };
+
+  const handleCancelQuotation = () => {
+    setCurrentView('home');
   };
 
   const handleLoginClick = () => {
@@ -79,6 +96,27 @@ export default function App() {
           onBack={handleBackToServices}
           onRequestQuote={handleRequestQuote}
         />
+        
+        {/* Footer */}
+        <Footer />
+      </div>
+    );
+  }
+
+  // Vista de Cotización
+  if (currentView === 'quotation') {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        {/* Navbar */}
+        <Navbar onLoginClick={handleLoginClick} />
+        
+        {/* Contenido de cotización */}
+        <div className="py-8">
+          <QuotationForm
+            onSave={handleCreateQuotation}
+            onCancel={handleCancelQuotation}
+          />
+        </div>
         
         {/* Footer */}
         <Footer />
