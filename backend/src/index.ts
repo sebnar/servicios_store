@@ -15,26 +15,30 @@ dotenv.config();
 const app = express();
 const PORT = 5000;
 
-// Configuración CORS básica y funcional
+// Configuración CORS definitiva con logs detallados
 app.use((req, res, next) => {
-  // Permitir cualquier origen
+  console.log(`🌐 [CORS] Request: ${req.method} ${req.path}`);
+  console.log(`🌐 [CORS] Origin: ${req.headers.origin || 'No origin'}`);
+  console.log(`🌐 [CORS] User-Agent: ${req.headers['user-agent'] || 'No user-agent'}`);
+  console.log(`🌐 [CORS] Headers: ${JSON.stringify(req.headers)}`);
+  
+  // Configurar headers CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
-  
-  // Permitir métodos HTTP
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
-  
-  // Permitir headers
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin');
-  
-  // No permitir credenciales
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin, X-Requested-With');
   res.setHeader('Access-Control-Allow-Credentials', 'false');
+  res.setHeader('Access-Control-Max-Age', '86400'); // 24 horas
+  
+  console.log(`🌐 [CORS] Headers set: Access-Control-Allow-Origin: *`);
   
   // Manejar preflight requests
   if (req.method === 'OPTIONS') {
+    console.log(`🌐 [CORS] Handling OPTIONS request for ${req.path}`);
     res.status(200).end();
     return;
   }
   
+  console.log(`🌐 [CORS] Proceeding to next middleware`);
   next();
 });
 
@@ -47,14 +51,15 @@ app.use((req, res, next) => {
 
 // Log de requests para debug
 app.use((req, res, next) => {
-  console.log(`${new Date().toISOString()} - ${req.method} ${req.path} - Origin: ${req.headers.origin || 'No origin'}`);
-  console.log(`Headers: ${JSON.stringify(req.headers)}`);
+  console.log(`📝 [REQUEST] ${new Date().toISOString()} - ${req.method} ${req.path}`);
+  console.log(`📝 [REQUEST] Origin: ${req.headers.origin || 'No origin'}`);
+  console.log(`📝 [REQUEST] User-Agent: ${req.headers['user-agent'] || 'No user-agent'}`);
   
-  // Debug específico para CORS
+  // Debug específico para API
   if (req.path.includes('/api/')) {
-    console.log(`🔍 CORS Debug - Method: ${req.method}, Path: ${req.path}`);
-    console.log(`🔍 Origin: ${req.headers.origin}`);
-    console.log(`🔍 User-Agent: ${req.headers['user-agent']}`);
+    console.log(`🔍 [API] Processing API request: ${req.method} ${req.path}`);
+    console.log(`🔍 [API] Query params: ${JSON.stringify(req.query)}`);
+    console.log(`🔍 [API] Body: ${JSON.stringify(req.body)}`);
   }
   
   next();
@@ -82,17 +87,51 @@ app.get('/api/health', (req, res) => {
 
 // Ruta de prueba CORS
 app.get('/api/cors-test', (req, res) => {
-  res.json({ 
+  console.log(`🧪 [CORS-TEST] Request received: ${req.method} ${req.path}`);
+  console.log(`🧪 [CORS-TEST] Origin: ${req.headers.origin}`);
+  console.log(`🧪 [CORS-TEST] Headers: ${JSON.stringify(req.headers)}`);
+  
+  const response = { 
     message: 'CORS funcionando correctamente',
     origin: req.headers.origin,
     method: req.method,
-    timestamp: new Date().toISOString()
-  });
+    timestamp: new Date().toISOString(),
+    headers: req.headers
+  };
+  
+  console.log(`🧪 [CORS-TEST] Sending response: ${JSON.stringify(response)}`);
+  res.json(response);
+});
+
+// Middleware para log de respuestas
+app.use((req, res, next) => {
+  const originalSend = res.send;
+  const originalJson = res.json;
+  
+  res.send = function(data) {
+    console.log(`📤 [RESPONSE] ${req.method} ${req.path} - Status: ${res.statusCode}`);
+    console.log(`📤 [RESPONSE] Headers: ${JSON.stringify(res.getHeaders())}`);
+    if (req.path.includes('/api/')) {
+      console.log(`📤 [API-RESPONSE] Data: ${typeof data === 'string' ? data.substring(0, 200) : JSON.stringify(data).substring(0, 200)}`);
+    }
+    return originalSend.call(this, data);
+  };
+  
+  res.json = function(data) {
+    console.log(`📤 [RESPONSE] ${req.method} ${req.path} - Status: ${res.statusCode}`);
+    console.log(`📤 [RESPONSE] Headers: ${JSON.stringify(res.getHeaders())}`);
+    if (req.path.includes('/api/')) {
+      console.log(`📤 [API-RESPONSE] Data: ${JSON.stringify(data).substring(0, 200)}`);
+    }
+    return originalJson.call(this, data);
+  };
+  
+  next();
 });
 
 // Manejo de errores
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
-  console.error(err.stack);
+  console.error(`❌ [ERROR] ${req.method} ${req.path}: ${err.stack}`);
   res.status(500).json({ 
     message: 'Error interno del servidor',
     error: process.env.NODE_ENV === 'development' ? err.message : {}
