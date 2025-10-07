@@ -2,8 +2,12 @@ import express from 'express';
 import { body, param, query, validationResult } from 'express-validator';
 import Service from '../models/Service';
 import { authenticateToken, requireAdmin } from '../middleware/auth';
+import { applyCorsToRouter } from '../middleware/routeCors';
 
 const router = express.Router();
+
+// Aplicar CORS automáticamente a todas las rutas de este router
+applyCorsToRouter(router);
 
 // Aplicar autenticación y autorización de admin a todas las rutas
 router.use(authenticateToken);

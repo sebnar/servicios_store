@@ -3,6 +3,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import dotenv from 'dotenv';
 import { connectDB } from './utils/database';
+import { corsMiddleware, corsResponseMiddleware } from './middleware/cors';
 import authRoutes from './routes/auth';
 import adminRoutes from './routes/admin';
 import contentRoutes from './routes/content';
@@ -15,32 +16,8 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Configuración CORS definitiva con logs detallados
-app.use((req, res, next) => {
-  console.log(`🌐 [CORS] Request: ${req.method} ${req.path}`);
-  console.log(`🌐 [CORS] Origin: ${req.headers.origin || 'No origin'}`);
-  console.log(`🌐 [CORS] User-Agent: ${req.headers['user-agent'] || 'No user-agent'}`);
-  console.log(`🌐 [CORS] Headers: ${JSON.stringify(req.headers)}`);
-  
-  // Configurar headers CORS
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin, X-Requested-With');
-  res.setHeader('Access-Control-Allow-Credentials', 'false');
-  res.setHeader('Access-Control-Max-Age', '86400'); // 24 horas
-  
-  console.log(`🌐 [CORS] Headers set: Access-Control-Allow-Origin: *`);
-  
-  // Manejar preflight requests
-  if (req.method === 'OPTIONS') {
-    console.log(`🌐 [CORS] Handling OPTIONS request for ${req.path}`);
-    res.status(200).end();
-    return;
-  }
-  
-  console.log(`🌐 [CORS] Proceeding to next middleware`);
-  next();
-});
+// Configuración CORS transversal para TODAS las rutas
+app.use(corsMiddleware);
 
 // Middleware de seguridad (después de CORS) - Deshabilitado temporalmente para desarrollo
 // app.use(helmet({
@@ -103,31 +80,8 @@ app.get('/api/cors-test', (req, res) => {
   res.json(response);
 });
 
-// Middleware para log de respuestas
-app.use((req, res, next) => {
-  const originalSend = res.send;
-  const originalJson = res.json;
-  
-  res.send = function(data) {
-    console.log(`📤 [RESPONSE] ${req.method} ${req.path} - Status: ${res.statusCode}`);
-    console.log(`📤 [RESPONSE] Headers: ${JSON.stringify(res.getHeaders())}`);
-    if (req.path.includes('/api/')) {
-      console.log(`📤 [API-RESPONSE] Data: ${typeof data === 'string' ? data.substring(0, 200) : JSON.stringify(data).substring(0, 200)}`);
-    }
-    return originalSend.call(this, data);
-  };
-  
-  res.json = function(data) {
-    console.log(`📤 [RESPONSE] ${req.method} ${req.path} - Status: ${res.statusCode}`);
-    console.log(`📤 [RESPONSE] Headers: ${JSON.stringify(res.getHeaders())}`);
-    if (req.path.includes('/api/')) {
-      console.log(`📤 [API-RESPONSE] Data: ${JSON.stringify(data).substring(0, 200)}`);
-    }
-    return originalJson.call(this, data);
-  };
-  
-  next();
-});
+// Middleware para asegurar CORS en TODAS las respuestas
+app.use(corsResponseMiddleware);
 
 // Manejo de errores
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
@@ -138,13 +92,13 @@ app.use((err: any, req: express.Request, res: express.Response, next: express.Ne
   });
 });
 
-// Servir archivos estáticos del frontend
-app.use(express.static('/app/frontend/dist'));
-
-// Ruta 404 - solo para API
+// Ruta 404 - solo para API (ANTES de archivos estáticos)
 app.use('/api/*', (req, res) => {
   res.status(404).json({ message: 'Ruta de API no encontrada' });
 });
+
+// Servir archivos estáticos del frontend (DESPUÉS de rutas API)
+app.use(express.static('/app/frontend/dist'));
 
 // Para todas las demás rutas, servir el frontend (SPA)
 app.get('*', (req, res) => {

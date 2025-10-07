@@ -1,8 +1,12 @@
 import express from 'express';
 import { body, param, query, validationResult } from 'express-validator';
 import Service from '../models/Service';
+import { applyCorsToRouter } from '../middleware/routeCors';
 
 const router = express.Router();
+
+// Aplicar CORS automáticamente a todas las rutas de este router
+applyCorsToRouter(router);
 
 // Validaciones
 const createServiceValidation = [

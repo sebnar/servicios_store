@@ -3,8 +3,12 @@ import jwt from 'jsonwebtoken';
 import { body, validationResult } from 'express-validator';
 import User, { IUser } from '../models/User';
 import { authenticateToken } from '../middleware/auth';
+import { applyCorsToRouter } from '../middleware/routeCors';
 
 const router = express.Router();
+
+// Aplicar CORS automáticamente a todas las rutas de este router
+applyCorsToRouter(router);
 
 // Generar JWT
 const generateToken = (userId: string): string => {
