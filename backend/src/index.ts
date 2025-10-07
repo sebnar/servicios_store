@@ -9,6 +9,8 @@ import adminRoutes from './routes/admin';
 import contentRoutes from './routes/content';
 import servicesRoutes from './routes/services';
 import adminServicesRoutes from './routes/admin-services';
+import quotationsRoutes from './routes/quotations';
+import adminQuotationsRoutes from './routes/admin-quotations';
 
 // Cargar variables de entorno
 dotenv.config();
@@ -50,6 +52,8 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/content', contentRoutes);
 app.use('/api/services', servicesRoutes);
 app.use('/api/admin/services', adminServicesRoutes);
+app.use('/api/quotations', quotationsRoutes);
+app.use('/api/admin/quotations', adminQuotationsRoutes);
 
 // Ruta de salud
 app.get('/api/health', (req, res) => {
