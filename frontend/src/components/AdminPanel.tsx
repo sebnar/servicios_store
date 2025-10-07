@@ -458,6 +458,11 @@ export function AdminPanel({ onLogout }: AdminPanelProps) {
 
         {/* Contenido de gestión de cotizaciones */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded">
+            <p className="text-sm text-blue-800">
+              Debug: Cotizaciones cargadas: {quotations.length}, Loading: {quotationsLoading ? 'Sí' : 'No'}
+            </p>
+          </div>
           <QuotationList
             quotations={quotations}
             loading={quotationsLoading}

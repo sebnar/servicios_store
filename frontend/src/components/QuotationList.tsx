@@ -16,6 +16,7 @@ interface QuotationListProps {
 }
 
 export function QuotationList({ quotations, loading, onRefresh, onViewQuotation }: QuotationListProps) {
+  console.log('QuotationList render - quotations:', quotations.length, 'loading:', loading);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
 
