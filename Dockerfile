@@ -81,5 +81,5 @@ ENV PORT=5000
 # Exponer puertos
 EXPOSE 80 5000
 
-# Comando de inicio con verificación
-CMD ["dumb-init", "sh", "-c", "echo '🚀 Starting Servicios Store...' && cd /app/backend && echo '🔧 Building backend...' && npm run build && echo '🚀 Starting backend...' && npm start & echo '⏳ Waiting for backend...' && sleep 30 && echo '🔍 Checking backend...' && curl -f http://localhost:5000/api/health || echo '❌ Backend not responding' && echo '🌐 Starting Nginx...' && nginx -g 'daemon off;' & echo '✅ All services started!' && wait"]
+# Comando de inicio corregido
+CMD ["dumb-init", "sh", "-c", "echo '🚀 Starting Servicios Store...' && cd /app/backend && echo '🔧 Building backend...' && npm run build && echo '🚀 Starting backend...' && npm start & echo '⏳ Waiting for backend to be ready...' && sleep 35 && echo '🔍 Checking backend...' && curl -f http://localhost:5000/api/health && echo '✅ Backend is ready!' && echo '🌐 Starting Nginx...' && nginx -g 'daemon off;' & echo '✅ All services started!' && wait"]
