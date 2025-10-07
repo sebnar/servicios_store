@@ -33,7 +33,7 @@ export function AdminPanel({ onLogout }: AdminPanelProps) {
 
   const handleCreateService = async (serviceData: any) => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'https://servicios-store.onrender.com/api'}/admin/services`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://servicios-store-middle.onrender.com/api'}/admin/services`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -56,7 +56,7 @@ export function AdminPanel({ onLogout }: AdminPanelProps) {
 
   const handleUpdateService = async (id: string, serviceData: any) => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'https://servicios-store.onrender.com/api'}/admin/services/${id}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://servicios-store.onrender.com/api'}/admin/services/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -79,7 +79,7 @@ export function AdminPanel({ onLogout }: AdminPanelProps) {
 
   const handleDeleteService = async (id: string) => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'https://servicios-store.onrender.com/api'}/admin/services/${id}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://servicios-store.onrender.com/api'}/admin/services/${id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${apiService.getToken()}`
