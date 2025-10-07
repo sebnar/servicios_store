@@ -28,6 +28,8 @@ export function AdminPanel({ onLogout }: AdminPanelProps) {
   const { services, loading, refetch } = useServices({ limit: 100 });
   const { quotations, loading: quotationsLoading, refetch: refetchQuotations } = useAdminQuotations({ limit: 100 });
   
+  console.log('AdminPanel render - currentView:', currentView);
+  
   // Calcular estadísticas de cotizaciones
   const quotationStats = {
     total: quotations.length,
