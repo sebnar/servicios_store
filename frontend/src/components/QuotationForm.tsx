@@ -9,6 +9,10 @@ import { X, Plus, Save } from 'lucide-react';
 import { Service, QuotationRequest } from '../services/api';
 import { apiService } from '../services/api';
 
+/**
+ * Formulario para solicitar cotizaciones
+ * Permite a los clientes seleccionar servicios y proporcionar información
+ */
 interface QuotationFormProps {
   onSave: (quotationData: QuotationRequest) => Promise<void>;
   onCancel: () => void;
@@ -16,6 +20,7 @@ interface QuotationFormProps {
 }
 
 export function QuotationForm({ onSave, onCancel, isLoading = false }: QuotationFormProps) {
+  // Estado del formulario con datos iniciales
   const [formData, setFormData] = useState<QuotationRequest>({
     clientName: '',
     clientEmail: '',
@@ -27,6 +32,7 @@ export function QuotationForm({ onSave, onCancel, isLoading = false }: Quotation
     estimatedDelivery: ''
   });
 
+  // Lista de servicios disponibles
   const [services, setServices] = useState<Service[]>([]);
   const [loadingServices, setLoadingServices] = useState(true);
   const [newService, setNewService] = useState({

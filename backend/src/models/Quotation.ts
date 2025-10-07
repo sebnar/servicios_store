@@ -1,5 +1,9 @@
 import mongoose, { Document, Schema } from 'mongoose';
 
+/**
+ * Modelo de datos para cotizaciones
+ * Define la estructura y validaciones para las cotizaciones en MongoDB
+ */
 export interface IQuotation extends Document {
   // Información del cliente
   clientName: string;
@@ -37,6 +41,10 @@ export interface IQuotation extends Document {
   assignedTo?: mongoose.Types.ObjectId; // Usuario asignado
 }
 
+/**
+ * Esquema de MongoDB para cotizaciones
+ * Incluye validaciones, índices y middleware automático
+ */
 const QuotationSchema = new Schema<IQuotation>({
   // Información del cliente
   clientName: {
@@ -144,14 +152,20 @@ const QuotationSchema = new Schema<IQuotation>({
   timestamps: true
 });
 
-// Índices para optimizar consultas
+/**
+ * Índices para optimizar consultas frecuentes
+ * Mejoran el rendimiento en filtros y búsquedas
+ */
 QuotationSchema.index({ clientEmail: 1 });
 QuotationSchema.index({ status: 1 });
 QuotationSchema.index({ requestedDate: -1 });
 QuotationSchema.index({ createdBy: 1 });
 QuotationSchema.index({ assignedTo: 1 });
 
-// Middleware para actualizar fechas automáticamente
+/**
+ * Middleware pre-save para actualizar fechas automáticamente
+ * Establece completedDate cuando el status cambia a 'completed'
+ */
 QuotationSchema.pre('save', function(next) {
   if (this.status === 'completed' && !this.completedDate) {
     this.completedDate = new Date();

@@ -4,9 +4,16 @@ import Quotation from '../models/Quotation';
 import Service from '../models/Service';
 import { authenticateToken, requireAdmin } from '../middleware/auth';
 
+/**
+ * Rutas públicas para cotizaciones
+ * Permite a los clientes crear y consultar sus cotizaciones
+ */
 const router = express.Router();
 
-// Validaciones
+/**
+ * Validaciones para crear cotizaciones
+ * Incluye validación de campos requeridos y formatos
+ */
 const createQuotationValidation = [
   body('clientName')
     .trim()

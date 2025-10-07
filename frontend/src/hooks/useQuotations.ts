@@ -2,6 +2,10 @@ import { useState, useEffect } from 'react';
 import { Quotation, QuotationRequest } from '../services/api';
 import { apiService } from '../services/api';
 
+/**
+ * Hook para gestionar cotizaciones públicas
+ * Proporciona estado y funciones para CRUD de cotizaciones
+ */
 interface UseQuotationsOptions {
   status?: string;
   clientEmail?: string;

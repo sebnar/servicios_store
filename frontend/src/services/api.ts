@@ -1,5 +1,12 @@
+/**
+ * Servicio de API para comunicación con el backend
+ * Maneja todas las peticiones HTTP y autenticación
+ */
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
+/**
+ * Interfaces para autenticación y usuarios
+ */
 export interface LoginRequest {
   email: string;
   password: string;
