@@ -31,8 +31,8 @@ RUN npm ci
 # Configurar variables de entorno para el build del frontend
 ENV VITE_API_URL=https://servicios-store-unified.onrender.com/api
 
-# Construir el frontend
-RUN npm run build
+# Construir el frontend (solo Vite, sin TypeScript)
+RUN npx vite build
 
 # Volver al directorio raíz
 WORKDIR /app

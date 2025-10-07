@@ -37,7 +37,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         setUser(response.user);
       }
     } catch (error) {
-      console.error('Error verificando autenticación:', error);
+      console.error('Error verificando autenticacion:', error);
       apiService.logout();
       setUser(null);
     } finally {
