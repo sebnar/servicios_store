@@ -1,0 +1,25 @@
+services:
+  # Servicio unificado Frontend + Backend
+  - type: web
+    name: servicios-store-unified
+    env: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 80
+      - key: MONGODB_URI
+        fromDatabase:
+          name: servicios-store-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+    healthCheckPath: /api/health
+
+databases:
+  - name: servicios-store-db
+    plan: free
+    databaseName: servicios_store
+    user: admin

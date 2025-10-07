@@ -1,0 +1,25 @@
+{
+  "name": "home-page-design-university",
+  "version": "1.0.0",
+  "description": "Proyecto universitario - Home Page Design con Frontend y Backend",
+  "private": true,
+  "scripts": {
+    "start": "concurrently \"npm run frontend\" \"npm run backend\"",
+    "frontend": "cd frontend && npm run dev",
+    "backend": "cd backend && npm run dev",
+    "install": "npm install && cd frontend && npm install && cd ../backend && npm install",
+    "setup": "npm run install && echo '✅ Todo listo! Ejecuta: npm start'"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "keywords": [
+    "universidad",
+    "react",
+    "express",
+    "typescript",
+    "proyecto"
+  ],
+  "author": "Estudiante",
+  "license": "MIT"
+}
