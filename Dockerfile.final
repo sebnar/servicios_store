@@ -29,7 +29,7 @@ WORKDIR /app/frontend
 RUN npm ci
 
 # Configurar variables de entorno para el build
-ENV VITE_API_URL=https://servicios-store.onrender.com/api
+ENV VITE_API_URL=https://servicios-store-unified.onrender.com/api
 
 # Intentar construir el frontend con diferentes estrategias
 RUN npm run build || \

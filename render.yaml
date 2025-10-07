@@ -1,11 +1,9 @@
 services:
-  # Servicio de Backend
   - type: web
-    name: servicios-store-backend
-    env: node
+    name: servicios-store-unified
+    env: docker
+    dockerfilePath: ./Dockerfile.final
     plan: free
-    buildCommand: cd backend && npm install
-    startCommand: cd backend && npm start
     envVars:
       - key: NODE_ENV
         value: production
@@ -17,20 +15,12 @@ services:
           property: connectionString
       - key: JWT_SECRET
         generateValue: true
-
-  # Servicio de Frontend
-  - type: web
-    name: servicios-store-frontend
-    env: static
-    buildCommand: cd frontend && npm install && npm run build
-    staticPublishPath: ./frontend/dist
-    envVars:
       - key: VITE_API_URL
-        value: https://servicios-store-backend.onrender.com
+        value: https://servicios-store-unified.onrender.com/api
+    healthCheckPath: /api/health
 
-  # Base de datos MongoDB
-  - type: pserv
-    name: servicios-store-db
-    env: docker
-    dockerfilePath: ./Dockerfile.mongodb
+databases:
+  - name: servicios-store-db
     plan: free
+    databaseName: servicios_store
+    user: admin
