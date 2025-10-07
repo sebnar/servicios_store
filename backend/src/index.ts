@@ -24,8 +24,6 @@ app.use(corsMiddleware);
 //   crossOriginResourcePolicy: { policy: "cross-origin" }
 // }));
 
-// Manejar preflight requests (manejado por cors middleware)
-
 // Log de requests para debug
 app.use((req, res, next) => {
   console.log(`📝 [REQUEST] ${new Date().toISOString()} - ${req.method} ${req.path}`);

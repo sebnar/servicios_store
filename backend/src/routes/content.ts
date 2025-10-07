@@ -1,11 +1,7 @@
 import express from 'express';
 import Content from '../models/Content';
-import { applyCorsToRouter } from '../middleware/routeCors';
 
 const router = express.Router();
-
-// Aplicar CORS automáticamente a todas las rutas de este router
-applyCorsToRouter(router);
 
 // Obtener contenido público por tipo
 router.get('/:type', async (req: express.Request, res: express.Response) => {
