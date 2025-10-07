@@ -63,6 +63,67 @@ export interface CategoriesResponse {
   categories: string[];
 }
 
+export interface Quotation {
+  _id: string;
+  clientName: string;
+  clientEmail: string;
+  clientPhone?: string;
+  clientCompany?: string;
+  requestedServices: {
+    serviceId: string;
+    serviceName: string;
+    quantity?: number;
+    notes?: string;
+  }[];
+  status: 'pending' | 'in_progress' | 'completed' | 'cancelled';
+  estimatedBudget?: number;
+  finalBudget?: number;
+  currency: string;
+  requestedDate: string;
+  estimatedDelivery?: string;
+  completedDate?: string;
+  clientNotes?: string;
+  adminNotes?: string;
+  createdBy?: {
+    _id: string;
+    username: string;
+    email: string;
+  };
+  assignedTo?: {
+    _id: string;
+    username: string;
+    email: string;
+  };
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface QuotationRequest {
+  clientName: string;
+  clientEmail: string;
+  clientPhone?: string;
+  clientCompany?: string;
+  requestedServices: {
+    serviceId: string;
+    quantity?: number;
+    notes?: string;
+  }[];
+  estimatedBudget?: number;
+  currency?: string;
+  clientNotes?: string;
+  estimatedDelivery?: string;
+}
+
+export interface QuotationsResponse {
+  quotations: Quotation[];
+  pagination: {
+    currentPage: number;
+    totalPages: number;
+    totalItems: number;
+    itemsPerPage: number;
+  };
+}
+
 class ApiService {
   private getAuthHeaders(): HeadersInit {
     const token = localStorage.getItem('authToken');
@@ -245,6 +306,188 @@ class ApiService {
     if (!response.ok) {
       const error = await response.json();
       throw new Error(error.message || 'Error obteniendo categorías');
+    }
+
+    return response.json();
+  }
+
+  // Cotizaciones API
+  async createQuotation(quotationData: QuotationRequest): Promise<{ message: string; quotation: Quotation }> {
+    const response = await fetch(`${API_BASE_URL}/quotations`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(quotationData),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Error creando cotización');
+    }
+
+    return response.json();
+  }
+
+  async getQuotations(params?: {
+    status?: string;
+    clientEmail?: string;
+    limit?: number;
+    page?: number;
+  }): Promise<QuotationsResponse> {
+    const queryParams = new URLSearchParams();
+    
+    if (params?.status) queryParams.append('status', params.status);
+    if (params?.clientEmail) queryParams.append('clientEmail', params.clientEmail);
+    if (params?.limit) queryParams.append('limit', params.limit.toString());
+    if (params?.page) queryParams.append('page', params.page.toString());
+
+    const url = `${API_BASE_URL}/quotations${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+    
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Error obteniendo cotizaciones');
+    }
+
+    return response.json();
+  }
+
+  async getQuotationById(id: string): Promise<{ quotation: Quotation }> {
+    const response = await fetch(`${API_BASE_URL}/quotations/${id}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Error obteniendo cotización');
+    }
+
+    return response.json();
+  }
+
+  async updateQuotation(id: string, updateData: Partial<Quotation>): Promise<{ message: string; quotation: Quotation }> {
+    const response = await fetch(`${API_BASE_URL}/quotations/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(updateData),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Error actualizando cotización');
+    }
+
+    return response.json();
+  }
+
+  async deleteQuotation(id: string): Promise<{ message: string }> {
+    const response = await fetch(`${API_BASE_URL}/quotations/${id}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Error eliminando cotización');
+    }
+
+    return response.json();
+  }
+
+  // Admin Quotations API
+  async getAdminQuotations(params?: {
+    status?: string;
+    assignedTo?: string;
+    clientEmail?: string;
+    dateFrom?: string;
+    dateTo?: string;
+    limit?: number;
+    page?: number;
+  }): Promise<QuotationsResponse> {
+    const queryParams = new URLSearchParams();
+    
+    if (params?.status) queryParams.append('status', params.status);
+    if (params?.assignedTo) queryParams.append('assignedTo', params.assignedTo);
+    if (params?.clientEmail) queryParams.append('clientEmail', params.clientEmail);
+    if (params?.dateFrom) queryParams.append('dateFrom', params.dateFrom);
+    if (params?.dateTo) queryParams.append('dateTo', params.dateTo);
+    if (params?.limit) queryParams.append('limit', params.limit.toString());
+    if (params?.page) queryParams.append('page', params.page.toString());
+
+    const url = `${API_BASE_URL}/admin/quotations${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+    
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: this.getAuthHeaders(),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Error obteniendo cotizaciones (admin)');
+    }
+
+    return response.json();
+  }
+
+  async updateQuotationStatus(id: string, statusData: {
+    status: string;
+    adminNotes?: string;
+    assignedTo?: string;
+    finalBudget?: number;
+    estimatedDelivery?: string;
+  }): Promise<{ message: string; quotation: Quotation }> {
+    const response = await fetch(`${API_BASE_URL}/admin/quotations/${id}/status`, {
+      method: 'PUT',
+      headers: this.getAuthHeaders(),
+      body: JSON.stringify(statusData),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Error actualizando estado de cotización');
+    }
+
+    return response.json();
+  }
+
+  async assignQuotation(id: string, assignedTo: string): Promise<{ message: string; quotation: Quotation }> {
+    const response = await fetch(`${API_BASE_URL}/admin/quotations/${id}/assign`, {
+      method: 'PUT',
+      headers: this.getAuthHeaders(),
+      body: JSON.stringify({ assignedTo }),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Error asignando cotización');
+    }
+
+    return response.json();
+  }
+
+  async getQuotationStats(): Promise<any> {
+    const response = await fetch(`${API_BASE_URL}/admin/quotations/stats/overview`, {
+      method: 'GET',
+      headers: this.getAuthHeaders(),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Error obteniendo estadísticas de cotizaciones');
     }
 
     return response.json();
