@@ -37,6 +37,43 @@ export function AdminPanel({ onLogout }: AdminPanelProps) {
     cancelled: quotations.filter(q => q.status === 'cancelled').length
   };
 
+  // Obtener las 3 cotizaciones más recientes
+  const recentQuotations = quotations
+    .sort((a, b) => new Date(b.requestedDate).getTime() - new Date(a.requestedDate).getTime())
+    .slice(0, 3);
+
+  // Función para obtener el color del badge según el estado
+  const getStatusBadgeColor = (status: string) => {
+    switch (status) {
+      case 'pending':
+        return 'text-orange-600 border-orange-200 bg-orange-50';
+      case 'in_progress':
+        return 'text-blue-600 border-blue-200 bg-blue-50';
+      case 'completed':
+        return 'text-green-600 border-green-200 bg-green-50';
+      case 'cancelled':
+        return 'text-red-600 border-red-200 bg-red-50';
+      default:
+        return 'text-gray-600 border-gray-200 bg-gray-50';
+    }
+  };
+
+  // Función para obtener el texto del estado
+  const getStatusText = (status: string) => {
+    switch (status) {
+      case 'pending':
+        return 'Pendiente';
+      case 'in_progress':
+        return 'En Proceso';
+      case 'completed':
+        return 'Completada';
+      case 'cancelled':
+        return 'Cancelada';
+      default:
+        return status;
+    }
+  };
+
   const handleLogout = () => {
     if (confirm('¿Está seguro que desea cerrar sesión?')) {
       onLogout();
@@ -294,36 +331,64 @@ export function AdminPanel({ onLogout }: AdminPanelProps) {
                 Revise y responda a las solicitudes de cotización
               </p>
               
-              <div className="space-y-3">
-                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                  <div>
-                    <p className="font-medium text-sm">Desarrollo Web</p>
-                    <p className="text-xs text-gray-600">Cliente: María García</p>
-                  </div>
-                  <Badge variant="outline" className="text-orange-600 border-orange-200">
-                    Pendiente
-                  </Badge>
+              {quotationsLoading ? (
+                <div className="flex items-center justify-center py-4">
+                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+                  <span className="ml-2 text-sm text-gray-600">Cargando cotizaciones...</span>
                 </div>
-                
-                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                  <div>
-                    <p className="font-medium text-sm">Servicios en la Nube</p>
-                    <p className="text-xs text-gray-600">Cliente: Tech Corp</p>
-                  </div>
-                  <Badge variant="outline" className="text-green-600 border-green-200">
-                    Respondida
-                  </Badge>
+              ) : recentQuotations.length > 0 ? (
+                <div className="space-y-3">
+                  {recentQuotations.map((quotation) => (
+                    <div key={quotation._id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                      <div className="flex-1">
+                        <p className="font-medium text-sm">
+                          {quotation.requestedServices.length > 0 
+                            ? quotation.requestedServices[0].serviceName
+                            : 'Sin servicios'
+                          }
+                          {quotation.requestedServices.length > 1 && ` +${quotation.requestedServices.length - 1} más`}
+                        </p>
+                        <p className="text-xs text-gray-600">
+                          Cliente: {quotation.clientName}
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          {quotation.estimatedBudget && `Presupuesto: $${quotation.estimatedBudget} ${quotation.currency}`}
+                        </p>
+                      </div>
+                      <Badge variant="outline" className={getStatusBadgeColor(quotation.status)}>
+                        {getStatusText(quotation.status)}
+                      </Badge>
+                    </div>
+                  ))}
                 </div>
-              </div>
+              ) : (
+                <div className="text-center py-4">
+                  <p className="text-gray-500 text-sm">No hay cotizaciones recientes</p>
+                </div>
+              )}
               
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="w-full"
-                onClick={() => setCurrentView('quotations')}
-              >
-                Ver Todas las Cotizaciones
-              </Button>
+              <div className="flex gap-2">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="flex-1"
+                  onClick={() => setCurrentView('quotations')}
+                >
+                  Ver Todas las Cotizaciones
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={refetchQuotations}
+                  disabled={quotationsLoading}
+                >
+                  {quotationsLoading ? (
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                  ) : (
+                    'Actualizar'
+                  )}
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </div>
