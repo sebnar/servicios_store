@@ -372,7 +372,10 @@ export function AdminPanel({ onLogout }: AdminPanelProps) {
                   variant="outline" 
                   size="sm" 
                   className="flex-1"
-                  onClick={() => setCurrentView('quotations')}
+                  onClick={() => {
+                    console.log('Cambiando a vista de cotizaciones');
+                    setCurrentView('quotations');
+                  }}
                 >
                   Ver Todas las Cotizaciones
                 </Button>
@@ -412,6 +415,7 @@ export function AdminPanel({ onLogout }: AdminPanelProps) {
 
   // Vista de gestión de cotizaciones
   if (currentView === 'quotations') {
+    console.log('Renderizando vista de cotizaciones');
     return (
       <div className="min-h-screen bg-gray-50">
         {/* Header del panel */}
