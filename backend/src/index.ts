@@ -15,20 +15,7 @@ dotenv.config();
 const app = express();
 const PORT = 5000;
 
-// Configuración CORS - DEBE IR ANTES que otros middlewares
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin');
-  res.header('Access-Control-Allow-Credentials', 'false');
-  
-  if (req.method === 'OPTIONS') {
-    res.sendStatus(200);
-  } else {
-    next();
-  }
-});
-
+// Configuración CORS simplificada
 app.use(cors({
   origin: '*',
   credentials: false,
@@ -37,23 +24,32 @@ app.use(cors({
   optionsSuccessStatus: 200
 }));
 
+// Middleware adicional para CORS
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin');
+  res.header('Access-Control-Allow-Credentials', 'false');
+  
+  if (req.method === 'OPTIONS') {
+    res.sendStatus(200);
+    return;
+  }
+  
+  next();
+});
+
 // Middleware de seguridad (después de CORS) - Deshabilitado temporalmente para desarrollo
 // app.use(helmet({
 //   crossOriginResourcePolicy: { policy: "cross-origin" }
 // }));
 
-// Manejar preflight requests
-app.options('*', (req, res) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin');
-  res.header('Access-Control-Allow-Credentials', 'false');
-  res.sendStatus(200);
-});
+// Manejar preflight requests (manejado por cors middleware)
 
 // Log de requests para debug
 app.use((req, res, next) => {
   console.log(`${new Date().toISOString()} - ${req.method} ${req.path} - Origin: ${req.headers.origin || 'No origin'}`);
+  console.log(`Headers: ${JSON.stringify(req.headers)}`);
   next();
 });
 
