@@ -2,7 +2,7 @@
 FROM node:18-alpine
 
 # Instalar dependencias del sistema
-RUN apk add --no-cache dumb-init nginx
+RUN apk add --no-cache dumb-init nginx curl
 
 # Crear directorios
 RUN mkdir -p /app/uploads /app/frontend/dist /var/log/nginx
@@ -81,5 +81,9 @@ ENV PORT=5000
 # Exponer puertos
 EXPOSE 80 5000
 
-# Comando de inicio unificado con logs
-CMD ["dumb-init", "sh", "-c", "cd /app/backend && npm run build && npm start & sleep 10 && echo 'Starting Nginx...' && nginx -g 'daemon off;' & wait"]
+# Copiar script de inicio
+COPY start.sh /app/start.sh
+RUN chmod +x /app/start.sh
+
+# Comando de inicio unificado
+CMD ["dumb-init", "/app/start.sh"]
