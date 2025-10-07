@@ -1,4 +1,4 @@
-# Dockerfile final para Frontend + Backend
+# Dockerfile unificado para Frontend + Backend
 FROM node:18-alpine
 
 # Instalar dependencias del sistema
@@ -28,21 +28,16 @@ RUN npm ci --only=production && npm cache clean --force
 WORKDIR /app/frontend
 RUN npm ci
 
-# Configurar variables de entorno para el build
-ENV VITE_API_URL=https://servicios-store.onrender.com/api
+# Configurar variables de entorno para el build del frontend
+ENV VITE_API_URL=https://servicios-store-unified.onrender.com/api
 
-# Intentar construir el frontend con diferentes estrategias
-RUN npm run build || \
-    (echo "Build con TypeScript falló, intentando solo Vite..." && \
-     npx vite build) || \
-    (echo "Build de Vite falló, creando build manual..." && \
-     mkdir -p dist && \
-     echo '<!DOCTYPE html><html><head><title>Servicios Store</title></head><body><h1>Servicios Store</h1><p>Frontend en construcción</p></body></html>' > dist/index.html)
+# Construir el frontend
+RUN npm run build
 
 # Volver al directorio raíz
 WORKDIR /app
 
-# Crear configuración de nginx completa
+# Crear configuración de nginx
 RUN echo 'events {' > /etc/nginx/nginx.conf && \
     echo '    worker_connections 1024;' >> /etc/nginx/nginx.conf && \
     echo '}' >> /etc/nginx/nginx.conf && \
@@ -57,10 +52,12 @@ RUN echo 'events {' > /etc/nginx/nginx.conf && \
     echo '        root /app/frontend/dist;' >> /etc/nginx/nginx.conf && \
     echo '        index index.html;' >> /etc/nginx/nginx.conf && \
     echo '' >> /etc/nginx/nginx.conf && \
+    echo '        # Servir archivos estáticos del frontend' >> /etc/nginx/nginx.conf && \
     echo '        location / {' >> /etc/nginx/nginx.conf && \
     echo '            try_files $uri $uri/ /index.html;' >> /etc/nginx/nginx.conf && \
     echo '        }' >> /etc/nginx/nginx.conf && \
     echo '' >> /etc/nginx/nginx.conf && \
+    echo '        # Proxy para la API del backend' >> /etc/nginx/nginx.conf && \
     echo '        location /api/ {' >> /etc/nginx/nginx.conf && \
     echo '            proxy_pass http://localhost:5000;' >> /etc/nginx/nginx.conf && \
     echo '            proxy_set_header Host $host;' >> /etc/nginx/nginx.conf && \
@@ -78,5 +75,5 @@ ENV PORT=5000
 # Exponer puertos
 EXPOSE 80 5000
 
-# Comando de inicio mejorado
+# Comando de inicio unificado
 CMD ["dumb-init", "sh", "-c", "cd /app/backend && npm start & sleep 5 && nginx -g 'daemon off;' & wait"]
