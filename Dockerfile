@@ -76,4 +76,4 @@ ENV PORT=5000
 EXPOSE 80 5000
 
 # Comando de inicio unificado
-CMD ["dumb-init", "sh", "-c", "cd /app/backend && npm start & sleep 5 && nginx -g 'daemon off;' & wait"]
+CMD ["dumb-init", "sh", "-c", "cd /app/backend && npm run build && npm start & sleep 10 && nginx -g 'daemon off;' & wait"]
