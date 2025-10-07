@@ -81,41 +81,5 @@ ENV PORT=5000
 # Exponer puertos
 EXPOSE 80 5000
 
-# Crear script de inicio directamente en el contenedor
-RUN echo '#!/bin/bash' > /app/start.sh && \
-    echo 'echo "🚀 Starting Servicios Store - Frontend + Backend"' >> /app/start.sh && \
-    echo '' >> /app/start.sh && \
-    echo 'check_backend() {' >> /app/start.sh && \
-    echo '    echo "🔍 Checking if backend is ready..."' >> /app/start.sh && \
-    echo '    for i in {1..30}; do' >> /app/start.sh && \
-    echo '        if curl -f http://localhost:5000/api/health > /dev/null 2>&1; then' >> /app/start.sh && \
-    echo '            echo "✅ Backend is ready!"' >> /app/start.sh && \
-    echo '            return 0' >> /app/start.sh && \
-    echo '        fi' >> /app/start.sh && \
-    echo '        echo "⏳ Waiting for backend... (attempt $i/30)"' >> /app/start.sh && \
-    echo '        sleep 2' >> /app/start.sh && \
-    echo '    done' >> /app/start.sh && \
-    echo '    echo "❌ Backend failed to start"' >> /app/start.sh && \
-    echo '    return 1' >> /app/start.sh && \
-    echo '}' >> /app/start.sh && \
-    echo '' >> /app/start.sh && \
-    echo 'echo "🔧 Starting backend..."' >> /app/start.sh && \
-    echo 'cd /app/backend' >> /app/start.sh && \
-    echo 'npm run build' >> /app/start.sh && \
-    echo 'npm start &' >> /app/start.sh && \
-    echo 'BACKEND_PID=$!' >> /app/start.sh && \
-    echo '' >> /app/start.sh && \
-    echo 'if check_backend; then' >> /app/start.sh && \
-    echo '    echo "🌐 Starting Nginx..."' >> /app/start.sh && \
-    echo '    nginx -g "daemon off;" &' >> /app/start.sh && \
-    echo '    NGINX_PID=$!' >> /app/start.sh && \
-    echo '    echo "✅ All services started successfully!"' >> /app/start.sh && \
-    echo '    wait' >> /app/start.sh && \
-    echo 'else' >> /app/start.sh && \
-    echo '    echo "❌ Failed to start backend"' >> /app/start.sh && \
-    echo '    exit 1' >> /app/start.sh && \
-    echo 'fi' >> /app/start.sh && \
-    chmod +x /app/start.sh
-
-# Comando de inicio unificado
-CMD ["dumb-init", "/app/start.sh"]
+# Comando de inicio simplificado
+CMD ["dumb-init", "sh", "-c", "cd /app/backend && npm run build && npm start & sleep 20 && echo 'Starting Nginx...' && nginx -g 'daemon off;' & wait"]
