@@ -18,11 +18,10 @@ COPY backend/ ./backend/
 COPY frontend/package*.json ./frontend/
 COPY frontend/ ./frontend/
 
-# Instalar dependencias del backend
+# Instalar dependencias del backend (mantener todas las dependencias)
 WORKDIR /app/backend
 RUN npm ci
 RUN npm run build
-RUN npm ci --only=production && npm cache clean --force
 
 # Instalar dependencias del frontend
 WORKDIR /app/frontend

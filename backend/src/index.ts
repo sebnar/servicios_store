@@ -15,24 +15,23 @@ dotenv.config();
 const app = express();
 const PORT = 5000;
 
-// Configuración CORS simplificada
-app.use(cors({
-  origin: '*',
-  credentials: false,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
-  optionsSuccessStatus: 200
-}));
-
-// Middleware adicional para CORS
+// Configuración CORS básica y funcional
 app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin');
-  res.header('Access-Control-Allow-Credentials', 'false');
+  // Permitir cualquier origen
+  res.setHeader('Access-Control-Allow-Origin', '*');
   
+  // Permitir métodos HTTP
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
+  
+  // Permitir headers
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin');
+  
+  // No permitir credenciales
+  res.setHeader('Access-Control-Allow-Credentials', 'false');
+  
+  // Manejar preflight requests
   if (req.method === 'OPTIONS') {
-    res.sendStatus(200);
+    res.status(200).end();
     return;
   }
   
@@ -50,6 +49,14 @@ app.use((req, res, next) => {
 app.use((req, res, next) => {
   console.log(`${new Date().toISOString()} - ${req.method} ${req.path} - Origin: ${req.headers.origin || 'No origin'}`);
   console.log(`Headers: ${JSON.stringify(req.headers)}`);
+  
+  // Debug específico para CORS
+  if (req.path.includes('/api/')) {
+    console.log(`🔍 CORS Debug - Method: ${req.method}, Path: ${req.path}`);
+    console.log(`🔍 Origin: ${req.headers.origin}`);
+    console.log(`🔍 User-Agent: ${req.headers['user-agent']}`);
+  }
+  
   next();
 });
 
@@ -69,6 +76,16 @@ app.get('/api/health', (req, res) => {
   res.json({ 
     status: 'OK', 
     message: 'Servidor funcionando correctamente',
+    timestamp: new Date().toISOString()
+  });
+});
+
+// Ruta de prueba CORS
+app.get('/api/cors-test', (req, res) => {
+  res.json({ 
+    message: 'CORS funcionando correctamente',
+    origin: req.headers.origin,
+    method: req.method,
     timestamp: new Date().toISOString()
   });
 });
