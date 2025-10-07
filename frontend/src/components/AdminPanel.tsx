@@ -27,6 +27,15 @@ export function AdminPanel({ onLogout }: AdminPanelProps) {
   const [currentView, setCurrentView] = useState<'dashboard' | 'services' | 'quotations'>('dashboard');
   const { services, loading, refetch } = useServices({ limit: 100 });
   const { quotations, loading: quotationsLoading, refetch: refetchQuotations } = useAdminQuotations({ limit: 100 });
+  
+  // Calcular estadísticas de cotizaciones
+  const quotationStats = {
+    total: quotations.length,
+    pending: quotations.filter(q => q.status === 'pending').length,
+    inProgress: quotations.filter(q => q.status === 'in_progress').length,
+    completed: quotations.filter(q => q.status === 'completed').length,
+    cancelled: quotations.filter(q => q.status === 'cancelled').length
+  };
 
   const handleLogout = () => {
     if (confirm('¿Está seguro que desea cerrar sesión?')) {
@@ -198,7 +207,7 @@ export function AdminPanel({ onLogout }: AdminPanelProps) {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-600">Total Servicios</p>
-                  <p className="text-2xl font-bold text-primary">10</p>
+                  <p className="text-2xl font-bold text-primary">{services.length}</p>
                 </div>
                 <Package className="h-8 w-8 text-primary" />
               </div>
@@ -210,7 +219,7 @@ export function AdminPanel({ onLogout }: AdminPanelProps) {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-600">Cotizaciones</p>
-                  <p className="text-2xl font-bold text-primary">24</p>
+                  <p className="text-2xl font-bold text-primary">{quotationStats.total}</p>
                 </div>
                 <BarChart3 className="h-8 w-8 text-primary" />
               </div>
@@ -221,8 +230,8 @@ export function AdminPanel({ onLogout }: AdminPanelProps) {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">Usuarios</p>
-                  <p className="text-2xl font-bold text-primary">156</p>
+                  <p className="text-sm font-medium text-gray-600">Pendientes</p>
+                  <p className="text-2xl font-bold text-primary">{quotationStats.pending}</p>
                 </div>
                 <Users className="h-8 w-8 text-primary" />
               </div>
@@ -233,8 +242,8 @@ export function AdminPanel({ onLogout }: AdminPanelProps) {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">Ingresos</p>
-                  <p className="text-2xl font-bold text-primary">$2.4M</p>
+                  <p className="text-sm font-medium text-gray-600">Completadas</p>
+                  <p className="text-2xl font-bold text-primary">{quotationStats.completed}</p>
                 </div>
                 <BarChart3 className="h-8 w-8 text-primary" />
               </div>
