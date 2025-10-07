@@ -114,7 +114,7 @@ router.post('/', createQuotationValidation, async (req: express.Request, res: ex
 
     // Agregar nombres de servicios
     quotationData.requestedServices = quotationData.requestedServices.map((reqService: any) => {
-      const service = services.find(s => s._id.toString() === reqService.serviceId);
+      const service = services.find((s: any) => s._id.toString() === reqService.serviceId);
       return {
         ...reqService,
         serviceName: service?.name || 'Servicio no encontrado'
@@ -124,7 +124,7 @@ router.post('/', createQuotationValidation, async (req: express.Request, res: ex
     // Calcular presupuesto estimado si no se proporciona
     if (!quotationData.estimatedBudget) {
       quotationData.estimatedBudget = quotationData.requestedServices.reduce((total: number, reqService: any) => {
-        const service = services.find(s => s._id.toString() === reqService.serviceId);
+        const service = services.find((s: any) => s._id.toString() === reqService.serviceId);
         return total + (service?.price || 0) * (reqService.quantity || 1);
       }, 0);
     }
